@@ -1,0 +1,8 @@
+*.pyc
+*.pyo
+.env
+*.sql
+*.sqlite
+
+createDatabase.py
+secrets.py
