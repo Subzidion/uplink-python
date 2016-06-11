@@ -1,10 +1,11 @@
+from datetime import datetime
+
 try:
     from __main__ import db
 except ImportError:
     from uplink import db
 
-
-class GenericModel(db.Model):
+class Rank(db.Model):
     def __init__(self, name, description, textureUUID):
         self.name = name
         self.description = description
@@ -23,17 +24,62 @@ class GenericModel(db.Model):
             'textureUUID': self.textureUUID
         }
 
-class Rank(GenericModel):
-    pass
+class Division(db.Model):
+    def __init__(self, name, description, textureUUID):
+        self.name = name
+        self.description = description
+        self.textureUUID = textureUUID
 
-class Division(GenericModel):
-    pass
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64))
+    description = db.Column(db.String(256))
+    textureUUID = db.Column(db.String(36))
 
-class Generation(GenericModel):
-    pass
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'description': self.description,
+            'textureUUID': self.textureUUID
+        }
 
-class Merit(GenericModel):
-    pass
+class Generation(db.Model):
+    def __init__(self, name, description, textureUUID):
+        self.name = name
+        self.description = description
+        self.textureUUID = textureUUID
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64))
+    description = db.Column(db.String(256))
+    textureUUID = db.Column(db.String(36))
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'description': self.description,
+            'textureUUID': self.textureUUID
+        }
+
+class Merit(db.Model):
+    def __init__(self, name, description, textureUUID):
+        self.name = name
+        self.description = description
+        self.textureUUID = textureUUID
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64))
+    description = db.Column(db.String(256))
+    textureUUID = db.Column(db.String(36))
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'description': self.description,
+            'textureUUID': self.textureUUID
+        }
 
 class Account(db.Model):
     def __init__(self, pid, UUID, username, displayName, status):
@@ -59,15 +105,35 @@ class Account(db.Model):
             'status': self.status
         }
 
+class PersonnelEnlistment(db.Model):
+    def __init__(self, pid, joinDate, generationID):
+        self.pid = pid
+        self.joinDate = datetime.strptime(joinDate, '%Y-%m-%d %H:%M:%S')
+        self.generationID = generationID
+
+    id = db.Column(db.Integer, primary_key=True)
+    pid = db.Column(db.Integer)
+    joinDate = db.Column(db.DateTime)
+    generationID = db.Column(db.Integer, db.ForeignKey(Generation.id))
+    generation = db.relationship('Generation', foreign_keys=generationID)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'pid': self.pid,
+            'joinDate': self.joinDate,
+            'generationID': self.generationID,
+            'generation': self.generation.name
+        }
+
 class Personnel(db.Model):
-    def __init__(self, password, active, generationID, pid, rankID=0, divisionID=0):
+    def __init__(self, password, active, accessLevel, pid, rankID=0, divisionID=0):
         self.password = password
         self.active = active
-        self.generationID = generationID
+        self.accessLevel = accessLevel
         self.pid = pid
         self.rankID = rankID
         self.divisionID = divisionID
-        self.generationID = generationID
 
     id = db.Column(db.Integer, primary_key=True)
     password = db.Column(db.String(64))
@@ -75,15 +141,17 @@ class Personnel(db.Model):
     accessLevel = db.Column(db.Integer)
     pid = db.Column(db.Integer)
     rankID = db.Column(db.Integer, db.ForeignKey(Rank.id))
+    rank = db.relationship('Rank', foreign_keys=rankID)
     divisionID = db.Column(db.Integer, db.ForeignKey(Division.id))
-    generationID = db.Column(db.Integer, db.ForeignKey(Generation.id))
+    division = db.relationship('Division', foreign_keys=divisionID)
 
     def to_dict(self):
         return {
             'id': self.id,
             'pid': self.pid,
             'active': self.active,
-            'rankID': self.rankID,
-            'divisionID': self.divisionID,
-            'generationID': self.generationID
+            'rank': self.rank.name,
+            'division': self.division.name,
         }
+
+

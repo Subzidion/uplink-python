@@ -10,7 +10,9 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:/
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-from models import Generation, Rank, Division, Merit, Personnel, Account
+import createDatabase
+
+from models import Generation, Rank, Division, Merit, Personnel, Account, PersonnelEnlistment
 
 @app.route('/')
 def index():
@@ -45,6 +47,11 @@ def accountByID(id):
 def meritByID(id):
     merit = Merit.query.get_or_404(id)
     return jsonify({'merit': merit.to_dict() })
+
+@app.route('/enlistment/<int:id>')
+def enlistmentByID(id):
+    enlistment = PersonnelEnlistment.query.get_or_404(id)
+    return jsonify({'enlistment': enlistment.to_dict() })
 
 @app.errorhandler(404)
 def resourceNotFound(e):
