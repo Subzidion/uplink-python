@@ -14,42 +14,65 @@ import createDatabase
 
 from models import Generation, Rank, Division, Merit, Personnel, PersonnelAccount, PersonnelEnlistment
 
-@app.route('/')
-def index():
-    return "Index"
+@app.route('/generation')
+def getGeneration():
+    generations = Generation.query.all()
+    return jsonify({'generations': [generation.to_dict() for generation in generations]})
+
 
 @app.route('/generation/<int:id>')
-def generationByID(id):
+def getGenerationByID(id):
     generation = Generation.query.get_or_404(id)
     return jsonify({'generation': generation.to_dict() })
 
+@app.route('/rank')
+def getRank():
+    ranks = Rank.query.all()
+    return jsonify({'ranks': [rank.to_dict() for rank in ranks]})
+
 @app.route('/rank/<int:id>')
-def rankByID(id):
+def getRankByID(id):
     rank = Rank.query.get_or_404(id)
     return jsonify({'rank': rank.to_dict() })
 
+@app.route('/division')
+def getDivision():
+    divisions = Division.query.all()
+    return jsonify({'divisions': [division.to_dict() for division in divisions]})
+
 @app.route('/division/<int:id>')
-def divisionByID(id):
+def getDivisionByID(id):
     division = Division.query.get_or_404(id)
     return jsonify({'division': division.to_dict() })
 
 @app.route('/personnel/<int:id>')
-def personnelByID(id):
+def getPersonnelByID(id):
     personnel = Personnel.query.get_or_404(id)
     return jsonify({'personnel': personnel.to_dict() })
 
+@app.route('/personnel/<username>')
+def getPersonnelByUsername(username):
+    account = PersonnelAccount.query.filter_by(username=username).first()
+    personnel = Personnel.query.get_or_404(account.pid)
+    return jsonify({'personnel': personnel.to_dict() })
+
 @app.route('/account/<int:id>')
-def accountByID(id):
+def getAccountByID(id):
     account = PersonnelAccount.query.get_or_404(id)
     return jsonify({'account': account.to_dict() })
 
+@app.route('/account/<username>')
+def getAccountByUsername(username):
+    account = PersonnelAccount.query.filter_by(username=username).first()
+    return jsonify({'account': account.to_dict() })
+
 @app.route('/merit/<int:id>')
-def meritByID(id):
+def getMeritByID(id):
     merit = Merit.query.get_or_404(id)
     return jsonify({'merit': merit.to_dict() })
 
 @app.route('/enlistment/<int:id>')
-def enlistmentByID(id):
+def getEnlistmentByID(id):
     enlistment = PersonnelEnlistment.query.get_or_404(id)
     return jsonify({'enlistment': enlistment.to_dict() })
 

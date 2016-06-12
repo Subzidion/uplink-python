@@ -91,11 +91,10 @@ class Personnel(db.Model):
         self.rankID = rankID
         self.divisionID = divisionID
 
-    id = db.Column(db.Integer, primary_key=True)
     password = db.Column(db.String(64))
     active = db.Column(db.String(3))
     accessLevel = db.Column(db.Integer)
-    pid = db.Column(db.Integer, unique=True)
+    pid = db.Column(db.Integer, primary_key=True)
     rankID = db.Column(db.Integer, db.ForeignKey(Rank.id))
     rank = db.relationship('Rank', foreign_keys=rankID)
     divisionID = db.Column(db.Integer, db.ForeignKey(Division.id))
@@ -109,7 +108,6 @@ class Personnel(db.Model):
         enlistmentList = [ enlistment.to_dict() for enlistment in self.enlistments ]
         meritList = [ merit.to_dict() for merit in self.merits]
         return {
-            'id': self.id,
             'pid': self.pid,
             'active': self.active,
             'rank': "None" if (self.rank is None) else self.rank.name,
@@ -144,6 +142,7 @@ class PersonnelAccount(db.Model):
     def __init__(self, pid, UUID, username, displayName, status):
         self.pid = pid
         self.UUID = UUID
+        self.username = username
         self.displayName = displayName
         self.status = status
 
