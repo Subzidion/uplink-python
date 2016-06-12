@@ -81,7 +81,66 @@ class Merit(db.Model):
             'textureUUID': self.textureUUID
         }
 
-class Account(db.Model):
+
+class Personnel(db.Model):
+    def __init__(self, password, active, accessLevel, pid, rankID=0, divisionID=0):
+        self.password = password
+        self.active = active
+        self.accessLevel = accessLevel
+        self.pid = pid
+        self.rankID = rankID
+        self.divisionID = divisionID
+
+    id = db.Column(db.Integer, primary_key=True)
+    password = db.Column(db.String(64))
+    active = db.Column(db.String(3))
+    accessLevel = db.Column(db.Integer)
+    pid = db.Column(db.Integer, unique=True)
+    rankID = db.Column(db.Integer, db.ForeignKey(Rank.id))
+    rank = db.relationship('Rank', foreign_keys=rankID)
+    divisionID = db.Column(db.Integer, db.ForeignKey(Division.id))
+    division = db.relationship('Division', foreign_keys=divisionID)
+    enlistments = db.relationship('PersonnelEnlistment', backref='personnel')
+    accounts = db.relationship('PersonnelAccount', backref='personnel')
+    merits = db.relationship('PersonnelMerit', backref='personnel')
+
+    def to_dict(self):
+        accountList = [ account.to_dict() for account in self.accounts ]
+        enlistmentList = [ enlistment.to_dict() for enlistment in self.enlistments ]
+        meritList = [ merit.to_dict() for merit in self.merits]
+        return {
+            'id': self.id,
+            'pid': self.pid,
+            'active': self.active,
+            'rank': "None" if (self.rank is None) else self.rank.name,
+            'division': "None" if (self.rank is None) else self.division.name,
+            'accounts': accountList,
+            'enlistments': enlistmentList,
+            'merits': meritList
+        }
+
+class PersonnelEnlistment(db.Model):
+    def __init__(self, pid, joinDate, generationID):
+        self.pid = pid
+        self.joinDate = datetime.strptime(joinDate, '%Y-%m-%d %H:%M:%S')
+        self.generationID = generationID
+
+    id = db.Column(db.Integer, primary_key=True)
+    joinDate = db.Column(db.DateTime)
+    pid = db.Column(db.Integer, db.ForeignKey(Personnel.pid))
+    generationID = db.Column(db.Integer, db.ForeignKey(Generation.id))
+    generation = db.relationship('Generation', foreign_keys=generationID)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'pid': self.pid,
+            'joinDate': self.joinDate,
+            'generationID': self.generationID,
+            'generation': self.generation.name
+        }
+
+class PersonnelAccount(db.Model):
     def __init__(self, pid, UUID, username, displayName, status):
         self.pid = pid
         self.UUID = UUID
@@ -89,7 +148,7 @@ class Account(db.Model):
         self.status = status
 
     id = db.Column(db.Integer, primary_key=True)
-    pid = db.Column(db.Integer)
+    pid = db.Column(db.Integer, db.ForeignKey(Personnel.pid))
     UUID = db.Column(db.String(36))
     username = db.Column(db.String(32))
     displayName = db.Column(db.String(32))
@@ -105,53 +164,24 @@ class Account(db.Model):
             'status': self.status
         }
 
-class PersonnelEnlistment(db.Model):
-    def __init__(self, pid, joinDate, generationID):
+class PersonnelMerit(db.Model):
+    def __init__(self, pid, meritID, dateAcquired, description):
         self.pid = pid
-        self.joinDate = datetime.strptime(joinDate, '%Y-%m-%d %H:%M:%S')
-        self.generationID = generationID
+        self.meritID = meritID
+        self.dateAcquired = datetime.strptime(dateAcquired, '%Y-%m-%d %H:%M:%S')
+        self.description = description
 
     id = db.Column(db.Integer, primary_key=True)
-    pid = db.Column(db.Integer)
-    joinDate = db.Column(db.DateTime)
-    generationID = db.Column(db.Integer, db.ForeignKey(Generation.id))
-    generation = db.relationship('Generation', foreign_keys=generationID)
+    pid = db.Column(db.Integer, db.ForeignKey(Personnel.pid))
+    meritID = db.Column(db.Integer, db.ForeignKey(Merit.id))
+    merit = db.relationship('Merit', foreign_keys=meritID)
+    dateAcquired = db.Column(db.DateTime)
+    description = db.Column(db.String(256))
 
     def to_dict(self):
         return {
-            'id': self.id,
             'pid': self.pid,
-            'joinDate': self.joinDate,
-            'generationID': self.generationID,
-            'generation': self.generation.name
+            'merit': self.merit.name,
+            'dateAcquired': self.dateAcquired,
+            'description': self.description
         }
-
-class Personnel(db.Model):
-    def __init__(self, password, active, accessLevel, pid, rankID=0, divisionID=0):
-        self.password = password
-        self.active = active
-        self.accessLevel = accessLevel
-        self.pid = pid
-        self.rankID = rankID
-        self.divisionID = divisionID
-
-    id = db.Column(db.Integer, primary_key=True)
-    password = db.Column(db.String(64))
-    active = db.Column(db.String(3))
-    accessLevel = db.Column(db.Integer)
-    pid = db.Column(db.Integer)
-    rankID = db.Column(db.Integer, db.ForeignKey(Rank.id))
-    rank = db.relationship('Rank', foreign_keys=rankID)
-    divisionID = db.Column(db.Integer, db.ForeignKey(Division.id))
-    division = db.relationship('Division', foreign_keys=divisionID)
-
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'pid': self.pid,
-            'active': self.active,
-            'rank': self.rank.name,
-            'division': self.division.name,
-        }
-
-

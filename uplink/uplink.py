@@ -12,7 +12,7 @@ db = SQLAlchemy(app)
 
 import createDatabase
 
-from models import Generation, Rank, Division, Merit, Personnel, Account, PersonnelEnlistment
+from models import Generation, Rank, Division, Merit, Personnel, PersonnelAccount, PersonnelEnlistment
 
 @app.route('/')
 def index():
@@ -40,7 +40,7 @@ def personnelByID(id):
 
 @app.route('/account/<int:id>')
 def accountByID(id):
-    account = Account.query.get_or_404(id)
+    account = PersonnelAccount.query.get_or_404(id)
     return jsonify({'account': account.to_dict() })
 
 @app.route('/merit/<int:id>')
