@@ -92,16 +92,13 @@ class Personnel(db.Model):
         self.divisionID = divisionID
 
     password = db.Column(db.String(64))
-    active = db.Column(db.String(3))
+    active = db.Column(db.Boolean)
     accessLevel = db.Column(db.Integer)
     pid = db.Column(db.Integer, primary_key=True)
     rankID = db.Column(db.Integer, db.ForeignKey(Rank.id))
     rank = db.relationship('Rank', foreign_keys=rankID)
     divisionID = db.Column(db.Integer, db.ForeignKey(Division.id))
     division = db.relationship('Division', foreign_keys=divisionID)
-    enlistments = db.relationship('PersonnelEnlistment', backref='personnel')
-    accounts = db.relationship('PersonnelAccount', backref='personnel')
-    merits = db.relationship('PersonnelMerit', backref='personnel')
 
     def to_dict(self):
         accountList = [ account.to_dict() for account in self.accounts ]
@@ -126,6 +123,7 @@ class PersonnelEnlistment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     joinDate = db.Column(db.DateTime)
     pid = db.Column(db.Integer, db.ForeignKey(Personnel.pid))
+    personnel = db.relationship('Personnel', backref='enlistments')
     generationID = db.Column(db.Integer, db.ForeignKey(Generation.id))
     generation = db.relationship('Generation', foreign_keys=generationID)
 
@@ -148,6 +146,7 @@ class PersonnelAccount(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     pid = db.Column(db.Integer, db.ForeignKey(Personnel.pid))
+    personnel = db.relationship('Personnel', backref='accounts')
     UUID = db.Column(db.String(36))
     username = db.Column(db.String(32))
     displayName = db.Column(db.String(32))
@@ -172,6 +171,7 @@ class PersonnelMerit(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     pid = db.Column(db.Integer, db.ForeignKey(Personnel.pid))
+    personnel = db.relationship('Personnel', backref='merits')
     meritID = db.Column(db.Integer, db.ForeignKey(Merit.id))
     merit = db.relationship('Merit', foreign_keys=meritID)
     dateAcquired = db.Column(db.DateTime)
