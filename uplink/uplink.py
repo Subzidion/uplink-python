@@ -83,6 +83,8 @@ def getAccountByID(id):
 @app.route('/account/<username>', methods=['GET'])
 def getAccountByUsername(username):
     account = PersonnelAccount.query.filter_by(username=username).first()
+    if account is None:
+        abort(404)
     return jsonify({'account': account.to_dict() })
 
 @app.route('/merit/<int:id>', methods=['GET'])
