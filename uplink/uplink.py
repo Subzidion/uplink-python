@@ -14,6 +14,23 @@ import createDatabase
 
 from models import Generation, Rank, Division, Merit, Personnel, PersonnelAccount, PersonnelEnlistment
 
+@app.route('/', methods=['GET'])
+def getIndex():
+    return jsonify({
+        'generations': 'https://uplink.subzidion.co/generation',
+        'generation': 'https://uplink.subzidion.co/generation/<id>',
+        'ranks': 'https://uplink.subzidion.co/rank',
+        'rank': 'https://uplink.subzidion.co/rank/<id>',
+        'divisions': 'https://uplink.subzidion.co/division',
+        'division': 'https://uplink.subzidion.co/division/<id>',
+        'merits': 'https://uplink.subzidion.co/merit',
+        'merit': 'https://uplink.subzidion.co/merit/<id>',
+        'account': 'https://uplink.subzidion.co/account/<id>',
+        'account': 'https://uplink.subzidion.co/account/<username>',
+        'personnel': 'https://uplink.subzidion.co/personnel/<pid>',
+        'personnel': 'https://uplink.subzidion.co/personnel/<username>'
+        })
+
 @app.route('/generation', methods=['GET'])
 def getGeneration():
     generations = Generation.query.all()
