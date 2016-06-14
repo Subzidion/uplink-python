@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, abort, jsonify
+from flask import Flask, request, abort, jsonify
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
@@ -36,6 +36,20 @@ def getGeneration():
     generations = Generation.query.all()
     return jsonify({'generations': [generation.to_dict() for generation in generations]})
 
+@app.route('/generation', methods=['POST'])
+def postGeneration():
+    if not request.json:
+        abort(400)
+    data = request.json
+    try:
+        generation = Generation(name=data['name'], description=data['description'], textureUUID=data['textureUUID'])
+    except KeyError:
+        abort(400)
+    db.session.add(generation)
+    db.session.commit()
+    r = jsonify(generation.to_dict())
+    r.status_code = 201
+    return r
 
 @app.route('/generation/<int:id>', methods=['GET'])
 def getGenerationByID(id):
@@ -47,6 +61,21 @@ def getRank():
     ranks = Rank.query.all()
     return jsonify({'ranks': [rank.to_dict() for rank in ranks]})
 
+@app.route('/rank', methods=['POST'])
+def postRank():
+    if not request.json:
+        abort(400)
+    data = request.json
+    try:
+        rank = Rank(name=data['name'], description=data['description'], textureUUID=data['textureUUID'])
+    except KeyError:
+        abort(400)
+    db.session.add(rank)
+    db.session.commit()
+    r = jsonify(rank.to_dict())
+    r.status_code = 201
+    return r
+
 @app.route('/rank/<int:id>', methods=['GET'])
 def getRankByID(id):
     rank = Rank.query.get_or_404(id)
@@ -56,6 +85,21 @@ def getRankByID(id):
 def getDivision():
     divisions = Division.query.all()
     return jsonify({'divisions': [division.to_dict() for division in divisions]})
+
+@app.route('/division', methods=['POST'])
+def postDivision():
+    if not request.json:
+        abort(400)
+    data = request.json
+    try:
+        division = Division(name=data['name'], description=data['description'], textureUUID=data['textureUUID'])
+    except KeyError:
+        abort(400)
+    db.session.add(division)
+    db.session.commit()
+    r = jsonify(division.to_dict())
+    r.status_code = 201
+    return r
 
 @app.route('/division/<int:id>', methods=['GET'])
 def getDivisionByID(id):
