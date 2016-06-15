@@ -83,17 +83,13 @@ class Merit(db.Model):
 
 
 class Personnel(db.Model):
-    def __init__(self, password, active, accessLevel, pid, rankID=0, divisionID=0):
-        self.password = password
-        self.active = active
-        self.accessLevel = accessLevel
+    def __init__(self, pid, active, rankID=0, divisionID=0):
         self.pid = pid
+        self.active = active
         self.rankID = rankID
         self.divisionID = divisionID
 
-    password = db.Column(db.String(64))
     active = db.Column(db.Boolean)
-    accessLevel = db.Column(db.Integer)
     pid = db.Column(db.Integer, primary_key=True)
     rankID = db.Column(db.Integer, db.ForeignKey(Rank.id))
     rank = db.relationship('Rank', foreign_keys=rankID)

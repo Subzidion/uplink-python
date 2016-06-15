@@ -31,8 +31,9 @@ def getIndex():
         'personnel': 'https://uplink.subzidion.co/personnel/<username>'
         })
 
+
 @app.route('/generation', methods=['GET'])
-def getGeneration():
+def getGenerations():
     generations = Generation.query.all()
     return jsonify({'generations': [generation.to_dict() for generation in generations]})
 
@@ -56,8 +57,33 @@ def getGenerationByID(id):
     generation = Generation.query.get_or_404(id)
     return jsonify({'generation': generation.to_dict() })
 
+@app.route('/generation/<int:id>/<attr>', methods=['GET'])
+def getGenerationAttrByID(id, attr):
+    generation = Generation.query.get_or_404(id)
+    try:
+        value = getattr(generation, attr)
+    except AttributeError:
+        abort(404)
+    return jsonify({attr: value })
+
+@app.route('/generation/<int:id>/<attr>', methods=['PUT'])
+def putGenerationAttrByID(id, attr):
+    if not hasattr(Generation, attr):
+        abort(404)
+    if not request.json or attr == 'id' or attr not in request.json:
+        abort(400)
+    data = request.json
+    generation = Generation.query.get_or_404(id)
+    try:
+        setattr(generation, attr, data[attr])
+    except KeyError:
+        abort(400)
+    db.session.commit()
+    return jsonify({attr: data[attr] })
+
+
 @app.route('/rank', methods=['GET'])
-def getRank():
+def getRanks():
     ranks = Rank.query.all()
     return jsonify({'ranks': [rank.to_dict() for rank in ranks]})
 
@@ -81,8 +107,34 @@ def getRankByID(id):
     rank = Rank.query.get_or_404(id)
     return jsonify({'rank': rank.to_dict() })
 
+@app.route('/rank/<int:id>/<attr>', methods=['PUT'])
+def putRankAttrByID(id, attr):
+    if not hasattr(Rank, attr):
+        abort(404)
+    if not request.json or attr == 'id' or attr not in request.json:
+        abort(400)
+    data = request.json
+    rank = Rank.query.get_or_404(id)
+    try:
+        setattr(rank, attr, data[attr])
+    except KeyError:
+        abort(400)
+    db.session.commit()
+    return jsonify({attr: data[attr] })
+
+@app.route('/rank/<int:id>/<attr>', methods=['GET'])
+def getRankAttrByID(id, attr):
+    rank = Rank.query.get_or_404(id)
+    try:
+        value = getattr(rank, attr)
+    except AttributeError:
+        abort(404)
+    return jsonify({attr: value })
+
+
+
 @app.route('/division', methods=['GET'])
-def getDivision():
+def getDivisions():
     divisions = Division.query.all()
     return jsonify({'divisions': [division.to_dict() for division in divisions]})
 
@@ -106,10 +158,111 @@ def getDivisionByID(id):
     division = Division.query.get_or_404(id)
     return jsonify({'division': division.to_dict() })
 
+@app.route('/division/<int:id>/<attr>', methods=['PUT'])
+def putDivisionAttrByID(id, attr):
+    if not hasattr(Division, attr):
+        abort(404)
+    if not request.json or attr == 'id' or attr not in request.json:
+        abort(400)
+    data = request.json
+    division = Division.query.get_or_404(id)
+    try:
+        setattr(division, attr, data[attr])
+    except KeyError:
+        abort(400)
+    db.session.commit()
+    return jsonify({attr: data[attr] })
+
+@app.route('/division/<int:id>/<attr>', methods=['GET'])
+def getDivisionAttrByID(id, attr):
+    division = Division.query.get_or_404(id)
+    try:
+        value = getattr(division, attr)
+    except AttributeError:
+        abort(404)
+    return jsonify({attr: value })
+
+
+
+@app.route('/merit', methods=['GET'])
+def getMerits():
+    merits = Merit.query.all()
+    return jsonify({'merit': [merit.to_dict() for merit in merits] })
+
+@app.route('/merit', methods=['POST'])
+def postMerit():
+    if not request.json:
+        abort(400)
+    data = request.json
+    try:
+        merit = Merit(name=data['name'], description=data['description'], textureUUID=data['textureUUID'])
+    except KeyError:
+        abort(400)
+    db.session.add(merit)
+    db.session.commit()
+    r = jsonify(merit.to_dict())
+    r.status_code = 201
+    return r
+
+@app.route('/merit/<int:id>', methods=['GET'])
+def getMeritByID(id):
+    merit = Merit.query.get_or_404(id)
+    return jsonify({'merit': merit.to_dict() })
+
+@app.route('/merit/<int:id>/<attr>', methods=['PUT'])
+def putMeritAttrByID(id, attr):
+    if not hasattr(Merit, attr):
+        abort(404)
+    if not request.json or attr == 'id' or attr not in request.json:
+        abort(400)
+    data = request.json
+    merit = Merit.query.get_or_404(id)
+    try:
+        setattr(merit, attr, data[attr])
+    except KeyError:
+        abort(400)
+    db.session.commit()
+    return jsonify({attr: data[attr] })
+
+@app.route('/merit/<int:id>/<attr>', methods=['GET'])
+def getMeritAttrByID(id, attr):
+    merit = Merit.query.get_or_404(id)
+    try:
+        value = getattr(merit, attr)
+    except AttributeError:
+        abort(404)
+    return jsonify({attr: value })
+
+
+
 @app.route('/personnel/<int:id>', methods=['GET'])
 def getPersonnelByID(id):
     personnel = Personnel.query.get_or_404(id)
     return jsonify({'personnel': personnel.to_dict() })
+
+@app.route('/personnel/<int:id>/<attr>', methods=['GET'])
+def getPersonnelAttrByID(id, attr):
+    personnel = Personnel.query.get_or_404(id)
+    try:
+        value = getattr(personnel, attr)
+    except AttributeError:
+        abort(404)
+    return jsonify({ attr: value })
+
+@app.route('/personnel/<int:id>/<attr>', methods=['PUT'])
+def putPersonnelAttrByID(id, attr):
+    if not hasattr(Personnel, attr):
+        abort(404)
+    if not request.json or attr == 'id' or attr not in request.json:
+        abort(400)
+    data = request.json
+    personnel = Personnel.query.get_or_404(id)
+    try:
+        setattr(personnel, attr, data[attr])
+    except KeyError:
+        abort(400)
+    db.session.commit()
+    return jsonify({ attr: data[attr] })
 
 @app.route('/personnel/<username>', methods=['GET'])
 def getPersonnelByUsername(username):
@@ -119,10 +272,70 @@ def getPersonnelByUsername(username):
     personnel = Personnel.query.get_or_404(account.pid)
     return jsonify({'personnel': personnel.to_dict() })
 
+@app.route('/personnel/<username>/<attr>', methods=['GET'])
+def getPersonnelAttrByUsername(username, attr):
+    account = PersonnelAccount.query.filter_by(username=username).first()
+    if account is None:
+        abort(404)
+    personnel = Personnel.query.get_or_404(account.pid)
+    try:
+        value = getattr(personnel, attr)
+    except AttributeError:
+        abort(404)
+    try:
+        return jsonify({ attr: [ item.to_dict() for item in value ] })
+    except TypeError:
+        return jsonify({ attr: value })
+
+@app.route('/personnel/<username>/<attr>', methods=['PUT'])
+def putPersonnelAttrByUsername(username, attr):
+    if not hasattr(Personnel, attr):
+        abort(404)
+    if not request.json or attr == 'id' or attr not in request.json:
+        abort(400)
+    data = request.json
+    account = PersonnelAccount.query.filter_by(username=username).first()
+    if account is None:
+        abort(404)
+    personnel = Personnel.query.get_or_404(account.pid)
+    try:
+        setattr(personnel, attr, data[attr])
+    except KeyError:
+        abort(400)
+    db.session.commit()
+    return jsonify({ attr: data[attr] })
+
 @app.route('/account/<int:id>', methods=['GET'])
 def getAccountByID(id):
     account = PersonnelAccount.query.get_or_404(id)
     return jsonify({'account': account.to_dict() })
+
+@app.route('/account/<username>/<attr>', methods=['GET'])
+def getAccountAttrByID(id, attr):
+    account = PersonnelAccount.query.get_or_404(id)
+    try:
+        value = getattr(account, attr)
+    except AttributeError:
+        abort(404)
+    try:
+        return jsonify({ attr: [ item.to_dict() for item in value ] })
+    except TypeError:
+        return jsonify({ attr: value })
+
+@app.route('/account/<username>/<attr>', methods=['PUT'])
+def putAccountAttrByID(id, attr):
+    if not hasattr(PersonnelAccount, attr):
+        abort(404)
+    if not request.json or attr == 'id' or attr not in request.json:
+        abort(400)
+    data = request.json
+    account = PersonnelAccount.query.get_or_404(id)
+    try:
+        setattr(account, attr, data[attr])
+    except KeyError:
+        abort(400)
+    db.session.commit()
+    return jsonify({ attr: data[attr] })
 
 @app.route('/account/<username>', methods=['GET'])
 def getAccountByUsername(username):
@@ -131,15 +344,41 @@ def getAccountByUsername(username):
         abort(404)
     return jsonify({'account': account.to_dict() })
 
-@app.route('/merit/<int:id>', methods=['GET'])
-def getMeritByID(id):
-    merit = Merit.query.get_or_404(id)
-    return jsonify({'merit': merit.to_dict() })
 
-@app.route('/enlistment/<int:id>', methods=['GET'])
-def getEnlistmentByID(id):
-    enlistment = PersonnelEnlistment.query.get_or_404(id)
-    return jsonify({'enlistment': enlistment.to_dict() })
+@app.route('/account/<username>/<attr>', methods=['GET'])
+def getAccountAttrByUsername(username, attr):
+    account = PersonnelAccount.query.filter_by(username=username).first()
+    if account is None:
+        abort(404)
+    try:
+        value = getattr(account, attr)
+    except AttributeError:
+        abort(404)
+    try:
+        return jsonify({ attr: [ item.to_dict() for item in value ] })
+    except TypeError:
+        return jsonify({ attr: value })
+
+@app.route('/account/<username>/<attr>', methods=['PUT'])
+def putAccountAttrByUsername(username, attr):
+    if not hasattr(PersonnelAccount, attr):
+        abort(404)
+    if not request.json or attr == 'id' or attr not in request.json:
+        abort(400)
+    data = request.json
+    account = PersonnelAccount.query.filter_by(username=username).first()
+    if account is None:
+        abort(404)
+    try:
+        setattr(account, attr, data[attr])
+    except KeyError:
+        abort(400)
+    db.session.commit()
+    return jsonify({ attr: data[attr] })
+
+@app.errorhandler(405)
+def resourceNotFound(e):
+    return jsonify({'error': 'Method Not Allowed.'})
 
 @app.errorhandler(404)
 def resourceNotFound(e):
@@ -149,6 +388,7 @@ def resourceNotFound(e):
 def resourceNotFound(e):
     return jsonify({'error': 'Bad Request.'})
 
+
+
 if __name__ == '__main__':
-    db.create_all()
     app.run()
