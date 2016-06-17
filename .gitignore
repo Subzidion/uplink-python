@@ -3,6 +3,7 @@
 .env
 *.sql
 *.sqlite
+*.swp
 
 createDatabase.py
-secrets.py
+archive/

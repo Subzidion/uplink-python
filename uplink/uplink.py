@@ -1,4 +1,4 @@
-from flask import Blueprint, request, abort, jsonify
+from flask import Blueprint, request, abort, jsonify, make_response
 
 from . import db
 
@@ -21,14 +21,14 @@ def getIndex():
         'personnel': 'https://uplink.subzidion.co/personnel/<username>'
         })
 
-@main.errorhandler(405)
+@main.app_errorhandler(405)
 def resourceNotFound(e):
-    return jsonify({'error': 'Method Not Allowed.'})
+    return make_response(jsonify({'error': 'Method Not Allowed.'}), 405)
 
-@main.errorhandler(404)
+@main.app_errorhandler(404)
 def resourceNotFound(e):
-    return jsonify({'error': 'Resource Not Found.'})
+    return make_response(jsonify({'error': 'Resource Not Found.'}), 404)
 
-@main.errorhandler(400)
+@main.app_errorhandler(400)
 def resourceNotFound(e):
-    return jsonify({'error': 'Bad Request.'})
+    return make_response(jsonify({'error': 'Bad Request.'}), 400)
