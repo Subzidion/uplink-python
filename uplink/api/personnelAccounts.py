@@ -10,19 +10,21 @@ def getAccountByID(id):
     account = PersonnelAccount.query.get_or_404(id)
     return jsonify({ 'account': account.to_dict() })
 
-@api.route('/account/<username>/<attr>', methods=['GET'])
+@api.route('/account/<int:id>/<attr>', methods=['GET'])
 def getAccountAttrByID(id, attr):
     account = PersonnelAccount.query.get_or_404(id)
     try:
         value = getattr(account, attr)
     except AttributeError:
         abort(404)
-    try:
+    if(type(value) == list):
         return jsonify({ attr: [ item.to_dict() for item in value ] })
-    except TypeError:
+    try:
+        return jsonify({ attr: value.to_dict() })
+    except AttributeError:
         return jsonify({ attr: value })
 
-@api.route('/account/<username>/<attr>', methods=['PUT'])
+@api.route('/account/<int:id>/<attr>', methods=['PUT'])
 def putAccountAttrByID(id, attr):
     if not hasattr(PersonnelAccount, attr):
         abort(404)
@@ -54,9 +56,11 @@ def getAccountAttrByUsername(username, attr):
         value = getattr(account, attr)
     except AttributeError:
         abort(404)
-    try:
+    if(type(value) == list):
         return jsonify({ attr: [ item.to_dict() for item in value ] })
-    except TypeError:
+    try:
+        return jsonify({ attr: value.to_dict() })
+    except AttributeError:
         return jsonify({ attr: value })
 
 @api.route('/account/<username>/<attr>', methods=['PUT'])

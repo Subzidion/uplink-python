@@ -17,9 +17,11 @@ def getPersonnelAttrByID(id, attr):
         value = getattr(personnel, attr)
     except AttributeError:
         abort(404)
-    try:
+    if(type(value) == list):
         return jsonify({ attr: [ item.to_dict() for item in value ] })
-    except TypeError:
+    try:
+        return jsonify({ attr: value.to_dict() })
+    except AttributeError:
         return jsonify({ attr: value })
 
 @api.route('/personnel/<int:id>/<attr>', methods=['PUT'])
@@ -55,9 +57,11 @@ def getPersonnelAttrByUsername(username, attr):
         value = getattr(personnel, attr)
     except AttributeError:
         abort(404)
-    try:
+    if(type(value) == list):
         return jsonify({ attr: [ item.to_dict() for item in value ] })
-    except TypeError:
+    try:
+        return jsonify({ attr: value.to_dict() })
+    except AttributeError:
         return jsonify({ attr: value })
 
 @api.route('/personnel/<username>/<attr>', methods=['PUT'])

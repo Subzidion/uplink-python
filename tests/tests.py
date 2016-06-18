@@ -110,6 +110,18 @@ class UplinkTestCases(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data['account']['username'], 'main.resident')
 
+    def testGetAccountAttrByID(self):
+        response = self.client.get('/account/2/UUID')
+        data = json.loads(response.get_data(as_text=True))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data['UUID'], 'a5904a08-57b1-48e7-9ab3-f93e831153e7')
+
+    def testGetAccountAttrByUsername(self):
+        response = self.client.get('/account/main.resident/UUID')
+        data = json.loads(response.get_data(as_text=True))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data['UUID'], 'e37adbcf-dfa1-4cea-9ae7-5c25856327d7')
+
     def testBadRequest(self):
         response = self.client.post('/division')
         self.assertEqual(response.status_code, 400)
