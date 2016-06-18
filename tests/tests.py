@@ -35,30 +35,30 @@ class UplinkTestCases(unittest.TestCase):
         self.assertEqual(response.status_code, 404)
 
     def testGetPersonnelByPID(self):
-        response = self.client.get('/personnel/29')
+        response = self.client.get('/personnel/2')
         data = json.loads(response.get_data(as_text=True))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(data['personnel']['pid'], 29)
-        self.assertEqual(data['personnel']['accounts'][0]['username'], 'subzidion.nightfire')
+        self.assertEqual(data['personnel']['pid'], 2)
+        self.assertEqual(data['personnel']['accounts'][0]['username'], 'main.resident')
 
     def testGetPersonnelByUsername(self):
-        response = self.client.get('/personnel/subzidion.nightfire')
+        response = self.client.get('/personnel/main.resident')
         data = json.loads(response.get_data(as_text=True))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(data['personnel']['pid'], 29)
-        self.assertEqual(data['personnel']['accounts'][0]['username'], 'subzidion.nightfire')
+        self.assertEqual(data['personnel']['pid'], 2)
+        self.assertEqual(data['personnel']['accounts'][0]['username'], 'main.resident')
 
     def testGetPersonnelAttrByPID(self):
-        response = self.client.get('/personnel/29/rankID')
+        response = self.client.get('/personnel/2/rankID')
         data = json.loads(response.get_data(as_text=True))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(data['rankID'], 18)
+        self.assertEqual(data['rankID'], 1)
 
     def testGetPersonnelAttrByUsername(self):
-        response = self.client.get('/personnel/subzidion.nightfire/rankID')
+        response = self.client.get('/personnel/main.resident/rankID')
         data = json.loads(response.get_data(as_text=True))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(data['rankID'], 18)
+        self.assertEqual(data['rankID'], 1)
 
     def testGetNonExistentGeneration(self):
         response = self.client.get('/generation/0')
@@ -68,27 +68,27 @@ class UplinkTestCases(unittest.TestCase):
         response = self.client.get('/generation/1')
         data = json.loads(response.get_data(as_text=True))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(data['generation']['name'], 'Singularity Construct')
+        self.assertEqual(data['generation']['name'], 'The Generation')
     
     def testGetNonExistentDivision(self):
         response = self.client.get('/division/99')
         self.assertEqual(response.status_code, 404)
 
     def testGetDivision(self):
-        response = self.client.get('/division/2')
+        response = self.client.get('/division/1')
         data = json.loads(response.get_data(as_text=True))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(data['division']['name'], 'Infantry')
+        self.assertEqual(data['division']['name'], 'The Division')
 
     def testGetNonExistentRank(self):
         response = self.client.get('/rank/99')
         self.assertEqual(response.status_code, 404)
 
     def testGetRank(self):
-        response = self.client.get('/rank/20')
+        response = self.client.get('/rank/1')
         data = json.loads(response.get_data(as_text=True))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(data['rank']['name'], 'Basileus')
+        self.assertEqual(data['rank']['name'], 'Rank I')
 
     def testGetNonExistentAccountByID(self):
         response = self.client.get('/account/0')
@@ -99,16 +99,16 @@ class UplinkTestCases(unittest.TestCase):
         self.assertEqual(response.status_code, 404)
 
     def testGetAccountByID(self):
-        response = self.client.get('/account/29')
+        response = self.client.get('/account/1')
         data = json.loads(response.get_data(as_text=True))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(data['account']['username'], 'subzidion.nightfire')
+        self.assertEqual(data['account']['username'], 'main.resident')
 
     def testGetAccountByUsername(self):
-        response = self.client.get('/account/subzidion.nightfire')
+        response = self.client.get('/account/main.resident')
         data = json.loads(response.get_data(as_text=True))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(data['account']['username'], 'subzidion.nightfire')
+        self.assertEqual(data['account']['username'], 'main.resident')
 
     def testBadRequest(self):
         response = self.client.post('/division')

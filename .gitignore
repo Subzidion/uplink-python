@@ -5,5 +5,5 @@
 *.sqlite
 *.swp
 
-createDatabase.py
+uplink/createDatabase.py
 archive/
