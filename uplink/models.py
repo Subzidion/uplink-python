@@ -6,6 +6,9 @@ try:
 except ImportError:
     from uplink import db
 
+__all__ = ['Rank', 'Division', 'Generation', 'Merit',
+           'Personnel', 'PersonnelEnlistment', 'PersonnelAccount', 'PersonnelMerit']
+
 class Rank(db.Model):
     def __init__(self, name, description, textureUUID):
         self.name = name
@@ -102,6 +105,8 @@ class Personnel(db.Model):
        self.password_hash = pwd_context.encrypt(password)
 
     def verify_password(self, password):
+        if not self.password_hash:
+            return False
         return pwd_context.verify(password, self.password_hash)
 
     def to_dict(self):
