@@ -105,9 +105,9 @@ class Personnel(db.Model):
             'active': self.active,
             'rank': "None" if (self.rank is None) else self.rank.name,
             'division': "None" if (self.rank is None) else self.division.name,
-            'accounts': accountList,
-            'enlistments': enlistmentList,
-            'merits': meritList
+            'accounts': [ account.to_dict() for account in self.accounts ],
+            'enlistments': [ enlistment.to_dict() for enlistment in self.enlistments ],
+            'merits': [ merit.to_dict() for merit in self.merits ]
         }
 
 class PersonnelEnlistment(db.Model):
