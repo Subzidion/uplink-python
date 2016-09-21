@@ -6,4 +6,5 @@
 *.swp
 
 uplink/createDatabase.py
+secrets.py
 archive/
