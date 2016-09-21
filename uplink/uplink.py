@@ -1,4 +1,4 @@
-from flask import Blueprint, request, abort, jsonify, make_response
+from flask import Blueprint, request, abort, jsonify, make_response, render_template
 
 from . import db
 
@@ -6,20 +6,7 @@ main = Blueprint('main', __name__)
 
 @main.route('/', methods=['GET'])
 def getIndex():
-    return jsonify({
-        'generations': 'https://uplink.subzidion.co/generation',
-        'generation': 'https://uplink.subzidion.co/generation/<id>',
-        'ranks': 'https://uplink.subzidion.co/rank',
-        'rank': 'https://uplink.subzidion.co/rank/<id>',
-        'divisions': 'https://uplink.subzidion.co/division',
-        'division': 'https://uplink.subzidion.co/division/<id>',
-        'merits': 'https://uplink.subzidion.co/merit',
-        'merit': 'https://uplink.subzidion.co/merit/<id>',
-        'account': 'https://uplink.subzidion.co/account/<id>',
-        'account': 'https://uplink.subzidion.co/account/<username>',
-        'personnel': 'https://uplink.subzidion.co/personnel/<pid>',
-        'personnel': 'https://uplink.subzidion.co/personnel/<username>'
-        })
+    return render_template('index.html')
 
 @main.app_errorhandler(405)
 def resourceNotFound(e):

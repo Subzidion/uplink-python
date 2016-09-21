@@ -1,4 +1,5 @@
 from datetime import datetime
+from passlib.apps import custom_app_context as pwd_context
 
 try:
     from __main__ import db
@@ -89,17 +90,21 @@ class Personnel(db.Model):
         self.rankID = rankID
         self.divisionID = divisionID
 
-    active = db.Column(db.Boolean)
     pid = db.Column(db.Integer, primary_key=True)
+    password_hash = db.Column(db.String(128)) 
+    active = db.Column(db.Boolean)
     rankID = db.Column(db.Integer, db.ForeignKey(Rank.id))
     rank = db.relationship('Rank', foreign_keys=rankID)
     divisionID = db.Column(db.Integer, db.ForeignKey(Division.id))
     division = db.relationship('Division', foreign_keys=divisionID)
 
+    def hash_password(self, password):
+       self.password_hash = pwd_context.encrypt(password)
+
+    def verify_password(self, password):
+        return pwd_context.verify(password, self.password_hash)
+
     def to_dict(self):
-        accountList = [ account.to_dict() for account in self.accounts ]
-        enlistmentList = [ enlistment.to_dict() for enlistment in self.enlistments ]
-        meritList = [ merit.to_dict() for merit in self.merits]
         return {
             'pid': self.pid,
             'active': self.active,
