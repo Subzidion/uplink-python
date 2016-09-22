@@ -1,7 +1,8 @@
 from flask import Blueprint, request, abort, jsonify, make_response, render_template, session, redirect, url_for
 
+from . import db
 from .auth import login_required
-from .models import Personnel
+from .models import Personnel, PersonnelAccount
 
 main = Blueprint('main', __name__)
 
@@ -18,12 +19,37 @@ def login():
             return render_template('login.html', error=True)
         else:
             session['logged_in'] = True
-            return render_template('index.html')
+            session['pid'] = request.form['pid']
+            session['displayName'] = PersonnelAccount.query.filter_by(pid=request.form['pid']).first().displayName
+            return redirect(url_for('main.login'))
 
 @main.route('/logout')
 def logout():
     session.pop('logged_in', None)
+    session.pop('pid', None)
+    session.pop('displayName', None)
     return redirect(url_for('main.login'))
+
+@main.route('/account/password', methods=['GET', 'POST'])
+@login_required
+def password():
+    if request.method == 'GET':
+        return render_template('change_password.html')
+    elif request.method == 'POST':
+        user = Personnel.query.filter_by(pid=session['pid']).first()
+        if not user.verify_password(request.form['current_password']):
+            return render_template('change_password.html', error=True)
+        if request.form['new_password'] != request.form['new_password_repeat']:
+            return render_template('change_password.html', error=True)
+        else:
+            user.hash_password(request.form['new_password'])
+            db.session.commit()
+            return redirect(url_for('main.home'))
+
+@main.route('/')
+@login_required
+def home():
+    return render_template('index.html')
 
 @main.app_errorhandler(405)
 def resourceNotFound(e):
