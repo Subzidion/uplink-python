@@ -1,6 +1,7 @@
 from flask import Blueprint, request, abort, jsonify, make_response, render_template, session, redirect, url_for
+from itsdangerous import (TimedJSONWebSignatureSerializer as Serializer, BadSignature, SignatureExpired)
 
-from . import db
+from . import db, app
 from .auth import login_required
 from .models import Personnel, PersonnelAccount
 
@@ -32,7 +33,7 @@ def logout():
 
 @main.route('/account/password', methods=['GET', 'POST'])
 @login_required
-def password():
+def change_password():
     if request.method == 'GET':
         return render_template('change_password.html')
     elif request.method == 'POST':
@@ -45,6 +46,33 @@ def password():
             user.hash_password(request.form['new_password'])
             db.session.commit()
             return redirect(url_for('main.home'))
+
+@main.route('/password/reset', methods=['GET', 'POST'])
+def request_reset_password():
+    if request.method == 'GET':
+        return render_template('request_reset_password.html')
+    elif request.method == 'POST':
+        user = Personnel.query.filter_by(pid=request.form['pid']).first()
+        if user:
+            s = Serializer(app.config['SECRET_KEY'], 600)
+            print(s.dumps({'pid': request.form['pid']}))
+            return redirect(url_for('main.login'))
+
+@main.route('/password/reset/<reset_token>', methods=['GET', 'POST'])
+def reset_password(reset_token):
+    if request.method == 'GET':
+        return render_template('reset_password.html')
+    elif request.method == 'POST':
+        s = Serializer(app.config['SECRET_KEY'])
+        data = s.loads(reset_token)
+        user = Personnel.query.filter_by(pid=data['pid']).first()
+        if request.form['new_password'] != request.form['new_password_repeat']:
+            return render_template('reset_password.html', error=True)
+        else:
+            user.hash_password(request.form['new_password'])
+            db.session.commit()
+            return redirect(url_for('main.login'))
+
 
 @main.route('/')
 @login_required

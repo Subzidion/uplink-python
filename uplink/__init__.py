@@ -6,8 +6,10 @@ from flask_sqlalchemy import SQLAlchemy
 from .secrets import SECRET_KEY
 
 db = SQLAlchemy()
+app = None
 
 def create_app(testing=False):
+    global app
     app = Flask(__name__)
     app.secret_key = SECRET_KEY 
     basedir = os.path.abspath(os.path.dirname(__file__))
